@@ -1,7 +1,7 @@
 # MTSU_Other
 
-## description
+## various programs from various classes.
 
-**bin** 
+**binBash** contains BASH implementations of various problems, including a unique shell.
 
-**Proxy** 
+**proxy** contains a progam that implements a daemon process that acts as a general TCP proxy server.
