@@ -1,0 +1,16 @@
+#!/bin/bash
+# tabc BY Ben Belden, CSCI 5900, Summer 2015
+
+sum=0
+for file in $@ ; do
+    x=0
+    if [[ -r $file ]] ; then
+        x=$( cat $file | tr '\n' ' ' | tr '\t' '\n' | wc -l )
+        (( sum= $sum + $x ))
+        printf "%s\t%s\n" $file $x
+    else
+        printf "%s\t-Cannot open\n" $file
+    fi
+done
+printf "TOTAL\t\t%s\n" $sum
+exit 0

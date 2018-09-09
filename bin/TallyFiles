@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# TallyFiles
+#
+# Ben Belden, CSCI 5900, ola4
+
+fCount=$( find $PWD -maxdepth 1 -type f | wc -l )
+if [ "$#" == 0 ] ; then printf "%s/\n\tfiles: %s\n" $PWD $fCount ; fi
+
+for arg in "$@" ; do
+    case $arg in 
+        -r) rFlag=true ;;
+        -d) dFlag=true ;;
+        -z) zFlag=true ;;
+        *)
+            cd $arg
+            fCount=$( find $PWD -maxdepth 1 -type f | wc -l )
+            dCount=$( find $PWD -maxdepth 1 -type d | grep -v ^$PWD$ | wc -l )
+            zCount=$( find $PWD -maxdepth 1 -type f -size 0 | wc -l )
+            printf "%s/\n\tfiles: %s\n" $PWD $fCount
+            if [ "$dFlag" == true ] ; then printf "\tdirs: %s\n" $dCount ; fi
+            if [ "$zFlag" == true ] ; then printf "\tzero: %s\n" $zCount ; fi
+
+            if [ "$rFlag" == true ] ; then
+                dirList=$( find $PWD -type d | grep -v ^$PWD$ | sort )
+                for dir in $dirList ; do
+                    returnLoop=$PWD
+                    cd $dir
+                    fLp=$( find $PWD -maxdepth 1 -type f | wc -l )
+                    dLp=$( find $PWD -maxdepth 1 -type d | grep -v ^$PWD$ | wc -l )
+                    zLp=$( find $PWD -maxdepth 1 -type f -size 0 | wc -l )
+                    printf "\t%s\n\t\tfiles: %s\n" $PWD $fLp
+                    if [ "$dFlag" == true ] ; then printf "\t\tdirs: %s\n" $dLp ; fi
+                    if [ "$zFlag" == true ] ; then printf "\t\tzero: %s\n" $zLp ; fi
+                    cd $returnLoop
+                done
+            fi
+        cd $returnPath
+    esac
+done
+exit 0
+

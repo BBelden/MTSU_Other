@@ -1,0 +1,102 @@
+#!/bin/bash
+#
+# Ben Belden
+# CSCI 5900 
+# Dr. Untch
+# OLA5
+# pecanshell
+
+declare tab=''
+
+function helpScreen(){
+    printf "\nPecanshell, version 1.0.0(1) release.\nThese shell commands are defined"
+    printf " internally.\nType 'help' to see this list.\n\n"
+    printf "contents\ndir\nedit filename\nflash\ngiveup\n"
+    printf "help\nlist\nprint filename\nwhozon\n\n"
+}
+
+function list(){
+    echo
+    files=$( ls -1 )
+    for file in $files ; do
+        if file "$file" | grep -q "text"; then echo $file; fi
+    done
+    echo
+}
+
+function dir(){
+    space='     '
+    local tab=$tab$space    
+    for file in "$1"/*; do
+        if file "$file" | grep -q "text"; then file=$(basename $file); printf "%s\n" $file | sed "s/^/$tab/g" 
+        elif [ -d "$file" ]; then file=$(basename $file); printf "%s\n" $file | sed "s/^/$tab/g"; dir "$file"; fi
+    done
+}
+
+function flash(){
+    val=$RANDOM
+    (( val=$val%10 ))
+    case $val in 
+        0) printf "\nNo! Try not! Do, or do not, there is no try.\n\n";;
+        1) printf "\nHelp me, Obi Wan Kenobi, you're my only hope!\n\n";;
+        2) printf "\nThe Force will be with you, always!\n\n";;
+        3) printf "\nThe Force is strong with you, but you are not a Jedi yet.\n\n";;
+        4) printf "\nWhy you stuck-up, half-witted, scruffy-looking nerf herder!\n\n";;
+        5) printf "\nThe possibility of successfully navigating this shell is approximately 3720 to 1!\n\n";;
+        6) printf "\nWill somebody please get this big, walking carpet out of my way?\n\n";;
+        7) printf "\nAren't you a little short for a stormtrooper?\n\n";;
+        8) printf "\nBut I was going into Tosche station to pick up some power converters!\n\n";;
+        9) printf "\nIt's against my programming to impersonate a deity.\n\n";;
+    esac
+}
+
+function whozon(){
+    echo
+    finger -l | grep "Login" | sed -e 's/Login: //g' -e 's/Name: //g' | sort \
+        | tr -s '\t' | tr '\t' ':' | cut -d ':' -f 2
+    echo
+}
+
+function edit(){
+    if file "$1" | grep -q "text" && [ -w "$1" ]; then
+        lines=$( cat "$1" | wc -l )
+        if [ $(( lines % 2 )) == 1 ] ; then (( lines++ )) ; fi
+        (( line= $lines / 2 ))
+        nano +"$line" $1
+    else
+        nano $1
+    fi
+}
+
+function prnt(){
+    if file "$1" | grep -q "text" && [ -w "$1" ]; then lph $1
+    else printf "Cannot print %s.\n" $1 ; fi
+}
+
+function error(){  
+    printf "\n%s is not a valid command. Type 'help' for options.\n\n" $1 
+}
+
+input=""
+while [ "$input" != "exit" ] ; do
+    printf "psh> " && read input
+    if [ "${input,,}" == "" ]; then continue; fi;
+    if [ "${input,,}" == "giveup" ] ; then input="exit"; continue; fi
+    if [ "${input,,}" == "realshell" ] ; then echo; ( bash ); echo; input=""; continue; fi
+    if [ "${input,,}" == "help" ] ; then helpScreen
+    elif [ "${input,,}" == "contents" ] || [ "${input,,}" == list ]; then list
+    elif [ "${input,,}" == "dir" ]; then printf "\n.\n"; dir $PWD; echo 
+    elif [ "${input,,}" == "flash" ]; then flash  
+    elif [ "${input,,}" == "whozon" ]; then whozon
+    elif ( echo $input | grep -q ' ' ); then
+        cmd=$( echo "$input" | cut -d ' ' -f 1 )
+        arg=$( echo "$input" | cut -d ' ' -f 2 )
+        if [ "${cmd,,}" == "edit" ]; then edit $arg
+        elif [ "${cmd,,}" == "print" ]; then prnt $arg
+        else error $input; input=""; continue; fi
+    else error $input; fi
+    input=""
+done
+
+exit 0
+

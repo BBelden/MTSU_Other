@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -z $1 ] ; then
+    x="$(find $PWD -type d | wc -l)"
+    ((x--))
+    printf "There are %s directories in %s.\n" $x $PWD 
+else
+    cd $1
+    x="$(find $PWD -type d | wc -l)"
+    ((x--))
+    printf "There are %s directories in %s.\n" $x $PWD 
+    cd
+fi
+
+exit 0
+

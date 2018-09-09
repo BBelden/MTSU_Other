@@ -1,0 +1,27 @@
+#!/bin/bash
+# 
+# Identify
+#
+# Ben Belden
+
+# original approach
+
+#getent passwd > /tmp/names.txt
+#for user in $(users | tr ' ' '\n' | uniq | sort);
+#do
+#    name="$(grep '^'$user /tmp/names.txt | cut -d : -f 5)"
+#    if ((${#user} < 8)); then
+#        printf "%s\t\t%s\n" $user "$name"
+#    else
+#        printf "%s\t%s\n" $user "$name"
+#    fi
+#done
+#rm /tmp/names.txt
+
+
+# or for a one-line approach
+finger -l | grep Login | tr -s '\t' | sed -e 's/Login: //g' -e 's/Name: //g' | sort
+
+exit 0
+
+
